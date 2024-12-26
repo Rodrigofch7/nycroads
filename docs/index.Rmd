@@ -208,9 +208,9 @@ nyc_census_data <- nyc_census_data %>%
 
 # Visualize deciles of population density with roads overlay
 ggplot() +
-  geom_sf(data = all_roads, color = "black", size = 0.0001) +   # Plot roads in black
-  geom_sf(data = nyc_census_data, aes(fill = Population_Density_Deciles, alpha = 0.8), color = NA) + # Add population density deciles with transparency
-  scale_fill_brewer(palette = "Blues", direction = 1) + # Use the "Blues" palette for fill
+  geom_sf(data = all_roads, color = "blue", size = 0.000001) +   # Plot roads in black
+  geom_sf(data = nyc_census_data, aes(fill = Population_Density_Deciles), color = NA, alpha = 0.9) + # Add population density deciles with transparency
+  scale_fill_brewer(palette = "RdYlBu", direction = 1, na.translate = FALSE) + # Exclude NA values
   theme_void()
 
 
