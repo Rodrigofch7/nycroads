@@ -215,3 +215,48 @@ ggplot() +
 
 
 ```
+```{r, warning=FALSE, message=FALSE}
+
+# Load the CBD shapefile
+cbd = read_sf("C:/Users/rodri/OneDrive - Insper/2024.2s_EconomiaRegionalEUrbana/Avaliações/ERUA2024.2_AvaliacaoBloco1_Dados/CBDs_EUA/CBDs_EUA.shp")
+
+# Filter to retain only the CBD for "New York, NY, Downtown"
+cbd <- cbd %>% 
+  filter(CBD == "New York, NY,Downtown")
+
+# Reproject the CBD data to match the coordinate reference system (CRS) of 'nyc_census_data'
+cbd <- st_transform(cbd, st_crs(nyc_census_data))
+
+# Generate centroids for the census data geometries
+centroids <- sf::st_centroid(x = nyc_census_data)
+
+# Calculate the distance matrix between the centroids and the CBD
+distance_matrix <- st_distance(centroids, cbd)
+
+# Convert the distance matrix into a numeric vector
+distance_vector <- as.numeric(distance_matrix)
+
+# Convert the distance vector into a data frame
+distance_df <- as.data.frame(distance_vector)
+
+# Add the distance values as a new column to the census data for comparison with median values
+nyc_census_data$Distance <- distance_df$distance_vector
+
+# Select only the variables of interest for analysis
+df <- nyc_census_data %>% 
+  select("Distance", "Population_Density")
+
+# Plot the relationship between distance and population density
+ggplot(data = df, mapping = aes(x = Distance, y = Population_Density)) +
+  geom_point(alpha = 0.5, colour = "red") +                 # Add scatter points with partial transparency
+  geom_smooth(method = "lm", na.rm = TRUE,                  # Add a linear trend line with a specific style
+              linewidth = 2.5, linetype = 7) +              
+  theme_classic() +                                         # Apply a classic theme
+  ggtitle(label = "Population Density and CBD Distance",    # Add a title and subtitle
+          subtitle = "New York") +
+  theme(plot.subtitle = element_text(size = 12, face = "italic")) +  # Customize subtitle appearance
+  xlim(0, 30000)                                            # Set the limits for the x-axis
+
+
+```
+
